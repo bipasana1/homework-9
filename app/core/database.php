@@ -5,56 +5,38 @@ namespace app\core;
 use PDO;
 use PDOException;
 
-trait Database
-{
+trait Database {
+    private $host = 'localhost'; // Change this to your database host if it's not localhost
+    private $dbname = 'homework_9'; // Change this to your database name
+    private $username = 'your_username'; // Change this to your database username
+    private $password = 'your_password'; // Change this to your database password
+    private $options = [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => false,
+    ];
+    protected $conn;
 
-    private function connect()
-    {
-        $options = [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false,
-        ];
-
-        $dsn = "mysql:hostname=".DBHOST.";dbname=".DBNAME;
-
+    public function __construct() {
         try {
-            return new PDO($dsn, DBUSER,DBPASS, $options);
+            $dsn = "mysql:host={$this->host};dbname={$this->dbname};charset=utf8mb4";
+            $this->conn = new PDO($dsn, $this->root, $this->root, $this->options);
         } catch (PDOException $e) {
-            throw new PDOException($e->getMessage(), $e->getCode());
+            echo "Connection failed: " . $e->getMessage();
         }
     }
 
-    //no params, one row
-    public function fetch($query) {
-        $connectedPDO = $this->connect();
-        $statementObject = $connectedPDO->query($query);
-        return $statementObject->fetch();
+    public function query($query) {
+        return $this->conn->query($query);
     }
 
-    //no params, all rows
+    public function queryWithParams($query, $params) {
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute($params);
+        return $stmt;
+    }
+
     public function fetchAll($query) {
-        $connectedPDO = $this->connect();
-        $statementObject = $connectedPDO->query($query);
-        return $statementObject->fetchAll();
+        return $this->conn->query($query)->fetchAll();
     }
-
-    //parms, will execute and return results
-    public function queryWithParams($query, $data, $className = null) {
-        $connectedPDO = $this->connect();
-        $statementObject = $connectedPDO->prepare($query);
-        $statementObject->execute($data);
-
-        if ($className) {
-            $statementObject->setFetchMode(PDO::FETCH_CLASS, $className);
-        }
-
-        $result = $statementObject->fetchAll();
-        if (is_array($result) && count($result)) {
-            return $result;
-        }
-        http_response_code(400);
-        return false;
-    }
-
 }
