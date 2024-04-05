@@ -5,38 +5,81 @@ namespace app\core;
 use PDO;
 use PDOException;
 
-trait Database {
-    private $host = 'localhost'; // Change this to your database host if it's not localhost
-    private $dbname = 'homework_9'; // Change this to your database name
-    private $username = 'your_username'; // Change this to your database username
-    private $password = 'your_password'; // Change this to your database password
-    private $options = [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES => false,
-    ];
-    protected $conn;
 
-    public function __construct() {
+Trait Database
+{
+
+    private function connect()
+    {
+        $type = 'mysql';
+        $server = 'localhost';
+        $db = 'homework_9';
+        $port = '8889';
+        $charset = 'utf8mb4';
+
+        $username = 'root';
+        $password = 'root';
+
+        $options = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            //set the default fetch type
+            //PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
+            PDO::ATTR_EMULATE_PREPARES => false,
+        ];
+
+        $dsn = "$type:host=$server;dbname=$db;port=$port;charset=$charset";
+
         try {
-            $dsn = "mysql:host={$this->host};dbname={$this->dbname};charset=utf8mb4";
-            $this->conn = new PDO($dsn, $this->root, $this->root, $this->options);
+            return new PDO($dsn, $username, $password, $options);
         } catch (PDOException $e) {
-            echo "Connection failed: " . $e->getMessage();
+            throw new PDOException($e->getMessage(), $e->getCode());
         }
     }
 
-    public function query($query) {
-        return $this->conn->query($query);
-    }
-
-    public function queryWithParams($query, $params) {
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute($params);
-        return $stmt;
+    public function fetch($query) {
+        $connectedPDO = $this->connect();
+        $statementObject = $connectedPDO->query($query);
+        //no params, one row
+        return $statementObject->fetch();
     }
 
     public function fetchAll($query) {
-        return $this->conn->query($query)->fetchAll();
+        $connectedPDO = $this->connect();
+        $statementObject = $connectedPDO->query($query);
+        //no params, multiple rows
+        return $statementObject->fetchAll();
     }
+
+    public function queryWithParams($query, $data, $className = null) {
+        $connectedPDO = $this->connect();
+
+        $statementObject = $connectedPDO->prepare($query);
+        $statementObject->execute($data);
+
+        if ($className) {
+            $statementObject->setFetchMode(PDO::FETCH_CLASS, $className);
+        }
+
+        $result = $statementObject->fetchAll();
+        if (is_array($result) && count($result)) {
+            return $result;
+        }
+
+        return false;
+    }
+
+    public function query($query)
+    {
+        $connectedPDO = $this->connect();
+        $stm = $connectedPDO->query($query);
+
+        $result = $stm->fetchAll();
+        if (is_array($result) && count($result)) {
+            return $result;
+        }
+
+        return false;
+    }
+
 }
