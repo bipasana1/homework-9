@@ -45,7 +45,7 @@ class PostController
         header("Content-Type: application/json");
         if ($id) {
             //TODO 5-c i: get a post data by id
-            $posts = $postModel->getPostById($id);
+            $posts = $postModel->getPostsById($id);
         } else {
             //TODO 5-a: get all posts
             $posts = $postModel->getAllPosts();
