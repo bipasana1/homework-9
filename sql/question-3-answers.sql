@@ -1,32 +1,19 @@
 -- select by id 1:
-Select *
-From posts
-Where id = 1;
+SELECT * FROM `posts` WHERE id=1; 
 
 -- select all posts where title = includes "title 2":
-Select *
-From posts
-Where title Like '%title 2%';
+SELECT * FROM `posts` WHERE title like '%title 2%'; 
 
 -- select all posts and order by the title column alphabetically:
-Select *
-From posts
-Order By title;
-
+SELECT * FROM `posts` ORDER BY title ASC; 
 
 -- insert 3 new posts
-Insert into posts (title, description) values
-('New Post 1', 'Description for New Post 1'),
-('New Post 2', 'Description for New Post 2'),
-('New Post 3', 'Description for New Post 3');
+insert into posts (title, description) values ('test post title 3', 'test post description 3');
+insert into posts (title, description) values ('test post title 4', 'test post description 4');
+insert into posts (title, description) values ('test post title 5', 'test post description 5');
 
-
--- update posts where id = 1, set the title to "new title"
-Update posts 
-Set title = 'new title'
-Where id = 1;
-
+-- update posts where id = 1, set the title to "Updated Post"
+update `posts` set `title`='Updated Post' where id=1; 
 
 -- delete post where id = 2
-Delete From posts
-Where id = 2;
+delete from `posts` where id=2; 

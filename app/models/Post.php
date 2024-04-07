@@ -2,13 +2,11 @@
 
 namespace app\models;
 
-use app\core\Database;
+use app\core\Database; 
 
 class Post
 {
-    //todo make methods here
-
-    use Database;
+    use Database; 
 
     public function getAllPosts() {
         $query = "select * from posts"; 
