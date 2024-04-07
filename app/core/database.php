@@ -5,55 +5,43 @@ namespace app\core;
 use PDO;
 use PDOException;
 
-
-Trait Database
+trait Database
 {
 
     private function connect()
     {
-        $type = 'mysql';
-        $server = 'localhost';
-        $db = 'homework_9';
-        $port = '8889';
-        $charset = 'utf8mb4';
-
-        $username = 'root';
-        $password = 'root';
-
         $options = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            //set the default fetch type
-            //PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
             PDO::ATTR_EMULATE_PREPARES => false,
         ];
 
-        $dsn = "$type:host=$server;dbname=$db;port=$port;charset=$charset";
+        $dsn = "mysql:hostname=".DBHOST.";dbname=".DBNAME;
 
         try {
-            return new PDO($dsn, $username, $password, $options);
+            return new PDO($dsn, DBUSER,DBPASS, $options);
         } catch (PDOException $e) {
             throw new PDOException($e->getMessage(), $e->getCode());
         }
     }
 
+    //no params, one row
     public function fetch($query) {
         $connectedPDO = $this->connect();
         $statementObject = $connectedPDO->query($query);
-        //no params, one row
         return $statementObject->fetch();
     }
 
+    //no params, all rows
     public function fetchAll($query) {
         $connectedPDO = $this->connect();
         $statementObject = $connectedPDO->query($query);
-        //no params, multiple rows
         return $statementObject->fetchAll();
     }
 
+    //parms, will execute and return results
     public function queryWithParams($query, $data, $className = null) {
         $connectedPDO = $this->connect();
-
         $statementObject = $connectedPDO->prepare($query);
         $statementObject->execute($data);
 
@@ -65,21 +53,7 @@ Trait Database
         if (is_array($result) && count($result)) {
             return $result;
         }
-
+        http_response_code(400);
         return false;
     }
-
-    public function query($query)
-    {
-        $connectedPDO = $this->connect();
-        $stm = $connectedPDO->query($query);
-
-        $result = $stm->fetchAll();
-        if (is_array($result) && count($result)) {
-            return $result;
-        }
-
-        return false;
-    }
-
 }
