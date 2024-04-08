@@ -1,6 +1,7 @@
 1. What is SQL? What are relational databases?
     SQL is a programming language for storing and processing information in a relational database.
-    Relational databases are a specific type of database that stores information in a structured way using tables.
+    Relational databases are a type of database that organizes data into rows and columns, which collectively form a table where the 
+    data points are related to one another. 
 
 4. What is a PDO in PHP? Why do we need to use prepared statements?
     PDO in PHP stands for PHP Data Objects. PDO acts as a middleman between your PHP code and the underlying database system.
